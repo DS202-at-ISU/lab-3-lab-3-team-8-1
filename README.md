@@ -113,10 +113,38 @@ returns <- av |>
   )
 ```
 
-Similarly, deal with the returns of characters.
+``` r
+deaths  <- deaths  %>% mutate(Death  = toupper(trimws(as.character(Death))))
+returns <- returns %>% mutate(Return = toupper(trimws(as.character(Return))))
 
-Based on these datasets calculate the average number of deaths an
-Avenger suffers.
+avg_deaths_tbl <- deaths %>%
+  mutate(is_death = Death == "YES") %>%
+  group_by(Name.Alias) %>%
+  summarize(death_count = sum(is_death), .groups = "drop")
+
+mean_deaths   <- mean(avg_deaths_tbl$death_count)
+median_deaths <- median(avg_deaths_tbl$death_count)
+max_deaths    <- max(avg_deaths_tbl$death_count)
+
+cat("Average deaths per Avenger:", round(mean_deaths, 3), "\n")
+```
+
+    ## Average deaths per Avenger: 0.546
+
+``` r
+cat("Median deaths:", median_deaths, "\n")
+```
+
+    ## Median deaths: 0
+
+``` r
+cat("Max deaths for any single Avenger:", max_deaths, "\n")
+```
+
+    ## Max deaths for any single Avenger: 7
+
+As a team, we found the average deaths per Avenger to be 0.546, the
+median to be 0, and the max was 7.
 
 ## Individually
 
@@ -131,6 +159,10 @@ possible.
 
 Nayan Menezes Statement: Out of 173 listed Avengers, my analysis found
 that 69 had died at least one time after they joined the team.
+
+Phillip Giametta Statement: I counted 89 total deaths — some unlucky
+Avengers are basically Meat Loaf with an E-ZPass — and on 57 occasions
+the individual made a comeback.
 
 ### Include the code
 
@@ -167,6 +199,23 @@ cat("Percentage of Avengers who died at least once:", round(percent_died, 1), "%
 
     ## Percentage of Avengers who died at least once: 39.3 %
 
+Phillip’s Code:
+
+``` r
+total_deaths <- deaths %>% filter(Death == "YES") %>% nrow()
+total_returns <- returns %>% filter(Return == "YES") %>% nrow()
+
+cat("Total recorded deaths:", total_deaths, "\n")
+```
+
+    ## Total recorded deaths: 89
+
+``` r
+cat("Total recorded returns:", total_returns, "\n")
+```
+
+    ## Total recorded returns: 57
+
 ### Include your answer
 
 Nayan’s Fact Check: It does seem that the number of avengers whom died
@@ -174,6 +223,14 @@ at least once hovers right around 40%, with an actual percentage of
 39.3%. However, the number of distinct avengers that was found based on
 finding distinct Name.Alias was actually 163, so it’s possible there was
 some duplicate rows.
+
+Phillip’s Fact Check: Overall my data supports the article. Looking at
+my results, there was 89 total deaths and 57 returns, so nearly 64.0% of
+deaths lead to a comeback. Paired with 64 of 163 or 39.3% Avengers dying
+at least once and an average of 0.546 deaths per Avenger (1.39 among
+only those who die). In the end we can see, this support’s the articles
+point that Avengers die fairly often but as he said, they don’t normally
+stay dead.
 
 Include at least one sentence discussing the result of your
 fact-checking endeavor.
