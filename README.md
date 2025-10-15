@@ -1,4 +1,3 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/LsTaLPbx)
 
 <!-- README.md is generated from README.Rmd. Please edit the README.Rmd file -->
 
@@ -72,6 +71,48 @@ between 1 and 5 (look into the function `parse_number`); Death is a
 categorical variables with values “yes”, “no” and ““. Call the resulting
 data set `deaths`.
 
+``` r
+library(dplyr)
+```
+
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
+``` r
+library(tidyr)
+library(readr)
+
+deaths <- av |>
+  pivot_longer(
+    cols = starts_with("Death"),
+    names_to = "Time_Death",
+    values_to = "Death"
+  ) |>
+  mutate(
+    Time_Death = parse_number(Time_Death),
+    Death = factor(Death, levels = c("YES", "NO", ""))
+  )
+
+returns <- av |>
+  pivot_longer(
+    cols = starts_with("Return"),
+    names_to = "Time_Return",
+    values_to = "Return"
+  ) |>
+  mutate(
+    Time_Return = parse_number(Time_Return),
+    Return = factor(Return, levels = c("YES", "NO", ""))
+  )
+```
+
 Similarly, deal with the returns of characters.
 
 Based on these datasets calculate the average number of deaths an
@@ -88,14 +129,51 @@ possible.
 
 ### FiveThirtyEight Statement
 
-> Quote the statement you are planning to fact-check.
+Nayan Menezes Statement: Out of 173 listed Avengers, my analysis found
+that 69 had died at least one time after they joined the team.
 
 ### Include the code
 
 Make sure to include the code to derive the (numeric) fact for the
 statement
 
+Nayan’s Code:
+
+``` r
+num_died <- deaths %>%
+  filter(Death == "YES") %>%
+  distinct(Name.Alias) %>%
+  nrow()
+
+cat("Number of Avengers who died at least once:", num_died, "\n")
+```
+
+    ## Number of Avengers who died at least once: 64
+
+``` r
+total_avengers <- deaths %>%
+  distinct(Name.Alias) %>%
+  nrow()
+
+cat("Total number of Avengers:", total_avengers, "\n")
+```
+
+    ## Total number of Avengers: 163
+
+``` r
+percent_died <- num_died / total_avengers * 100
+cat("Percentage of Avengers who died at least once:", round(percent_died, 1), "%\n")
+```
+
+    ## Percentage of Avengers who died at least once: 39.3 %
+
 ### Include your answer
+
+Nayan’s Fact Check: It does seem that the number of avengers whom died
+at least once hovers right around 40%, with an actual percentage of
+39.3%. However, the number of distinct avengers that was found based on
+finding distinct Name.Alias was actually 163, so it’s possible there was
+some duplicate rows.
 
 Include at least one sentence discussing the result of your
 fact-checking endeavor.
