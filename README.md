@@ -164,6 +164,8 @@ Phillip Giametta Statement: I counted 89 total deaths — some unlucky
 Avengers are basically Meat Loaf with an E-ZPass — and on 57 occasions
 the individual made a comeback.
 
+Nathan Krieger Statement: There’s a 2-in-3 chance that a member of the Avengers returned from their first stint in the afterlife, but only a 50 percent chance they recovered from a second or third death.
+
 ### Include the code
 
 Make sure to include the code to derive the (numeric) fact for the
