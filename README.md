@@ -92,8 +92,17 @@ library(dplyr)
 
 ``` r
 library(tidyr)
-library(readr)
+```
 
+    ## Warning: package 'tidyr' was built under R version 4.3.3
+
+``` r
+library(readr)
+```
+
+    ## Warning: package 'readr' was built under R version 4.3.3
+
+``` r
 deaths <- av |>
   pivot_longer(
     cols = starts_with("Death"),
@@ -168,7 +177,10 @@ Phillip Giametta Statement: I counted 89 total deaths — some unlucky
 Avengers are basically Meat Loaf with an E-ZPass — and on 57 occasions
 the individual made a comeback.
 
-### Include the code
+Kelly Arriaza Statemen: Iron Man, Hulk, Captain America, Thor, Hawkeye,
+Black Widow, Scarlet Witch, Quicksilver and The Vision — every single
+one of them has died at least once in the course of their time Avenging
+in the comics. In fact, Hawkeye died twice! \### Include the code
 
 Make sure to include the code to derive the (numeric) fact for the
 statement
@@ -282,6 +294,46 @@ print(rates)
     ## 4     4            1             1       1    
     ## 5     5            1             1       1
 
+Kelly’s Code:
+
+``` r
+#unique(av$Name.Alias)
+av <- av %>%
+  mutate(Name.Alias = tolower(Name.Alias))
+
+ds_names <- c("anthony edward \"tony\" stark", 
+              "robert bruce banner",
+              "steven rogers",
+              "thor odinson",
+              "clinton francis barton",
+              "natalia alianovna romanova",
+              "wanda maximoff",
+              "pietro maximoff",
+              "vision"
+              )
+
+results <- lapply(ds_names, function(name){
+  matches <- av %>% filter(str_detect(Name.Alias, name))
+  deaths <- sum(matches$Death1 == "YES", na.rm = TRUE) +
+    sum(matches$Death2 == "YES", na.rm = TRUE)
+  data.frame(Hero = str_to_title(name), Deaths = deaths)
+})
+
+death_summary <- bind_rows(results)
+print(death_summary)
+```
+
+    ##                          Hero Deaths
+    ## 1 Anthony Edward "Tony" Stark      1
+    ## 2         Robert Bruce Banner      1
+    ## 3               Steven Rogers      1
+    ## 4                Thor Odinson      2
+    ## 5      Clinton Francis Barton      2
+    ## 6  Natalia Alianovna Romanova      1
+    ## 7              Wanda Maximoff      1
+    ## 8             Pietro Maximoff      1
+    ## 9                      Vision      0
+
 ### Include your answer
 
 Nayan’s Fact Check: It does seem that the number of avengers whom died
@@ -304,6 +356,13 @@ a second death. This aligns closely with my statement that there is a
 “2-in-3 chance” of returning after the first death and roughly a 50%
 chance after subsequent deaths. Therefore, the statement is verified by
 the data.
+
+Kelly’s Fact Check: The dataset does prove that those Avengers
+characters have died at least once. The Vision was not able to be found
+in this dataset. The dataset also includes a second death for Thor that
+is not included in the article which could mean that they were not
+developed in the same time period or that the dataset has an additional
+entry.
 
 Include at least one sentence discussing the result of your
 fact-checking endeavor.
