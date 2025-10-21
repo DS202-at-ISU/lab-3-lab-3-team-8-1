@@ -72,6 +72,10 @@ categorical variables with values “yes”, “no” and ““. Call the resul
 data set `deaths`.
 
 ``` r
+#install.packages("tidyr")
+#install.packages("readr")
+
+
 library(dplyr)
 ```
 
@@ -164,8 +168,6 @@ Phillip Giametta Statement: I counted 89 total deaths — some unlucky
 Avengers are basically Meat Loaf with an E-ZPass — and on 57 occasions
 the individual made a comeback.
 
-Nathan Krieger Statement: There’s a 2-in-3 chance that a member of the Avengers returned from their first stint in the afterlife, but only a 50 percent chance they recovered from a second or third death.
-
 ### Include the code
 
 Make sure to include the code to derive the (numeric) fact for the
@@ -218,6 +220,68 @@ cat("Total recorded returns:", total_returns, "\n")
 
     ## Total recorded returns: 57
 
+Nathan’s Code:
+
+``` r
+#install.packages("stringr")
+library(stringr)
+# select only the relevant columns (Name + Death1..5 + Return1..5)
+cols <- c("Name.Alias", paste0("Death", 1:5), paste0("Return", 1:5))
+av2 <- av %>% select(any_of(cols))
+
+# pivot longer into a single long table with 'what' (Death/Return) and 'time', then pivot wider
+long <- av2 %>%
+  pivot_longer(
+    cols = -Name.Alias,
+    names_to = c("what", "time"),
+    names_pattern = "([A-Za-z]+)(\\d)"
+  ) %>%
+  mutate(
+    time = as.integer(time),
+    value = toupper(str_trim(replace_na(value, "")))
+  )
+
+# spread Death/Return into separate columns (one row per Name.Alias x time)
+wide <- long %>%
+  pivot_wider(names_from = what, values_from = value) %>%
+  mutate(
+    Death = factor(Death, levels = c("YES", "NO", "")),
+    Return = factor(Return, levels = c("YES", "NO", ""))
+  )
+```
+
+    ## Warning: Values from `value` are not uniquely identified; output will contain list-cols.
+    ## • Use `values_fn = list` to suppress this warning.
+    ## • Use `values_fn = {summary_fun}` to summarise duplicates.
+    ## • Use the following dplyr code to identify duplicates.
+    ##   {data} |>
+    ##   dplyr::summarise(n = dplyr::n(), .by = c(Name.Alias, time, what)) |>
+    ##   dplyr::filter(n > 1L)
+
+``` r
+# compute return rates after each death-time (only counting rows where Death == "YES")
+rates <- wide %>%
+  filter(Death == "YES") %>%
+  group_by(time) %>%
+  summarize(
+    total_deaths = n(),
+    total_returns = sum(Return == "YES", na.rm = TRUE),
+    return_rate = total_returns / total_deaths,
+    .groups = "drop"
+  )
+
+print(rates)
+```
+
+    ## # A tibble: 5 × 4
+    ##    time total_deaths total_returns return_rate
+    ##   <int>        <int>         <int>       <dbl>
+    ## 1     1           63            44       0.698
+    ## 2     2           15             8       0.533
+    ## 3     3            2             1       0.5  
+    ## 4     4            1             1       1    
+    ## 5     5            1             1       1
+
 ### Include your answer
 
 Nayan’s Fact Check: It does seem that the number of avengers whom died
@@ -233,6 +297,13 @@ at least once and an average of 0.546 deaths per Avenger (1.39 among
 only those who die). In the end we can see, this support’s the articles
 point that Avengers die fairly often but as he said, they don’t normally
 stay dead.
+
+Nathan Krieger’s Fact Check: Based on the dataset, approximately 70% of
+Avengers returned after their first death, and about 53% returned after
+a second death. This aligns closely with my statement that there is a
+“2-in-3 chance” of returning after the first death and roughly a 50%
+chance after subsequent deaths. Therefore, the statement is verified by
+the data.
 
 Include at least one sentence discussing the result of your
 fact-checking endeavor.
